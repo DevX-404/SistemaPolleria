@@ -22,7 +22,17 @@ import {
     faClipboardList,   // <--- NUEVO (Lista Pedidos)
     faTimes, // <--- AGREGAR
     faPrint,  // <--- AGREGAR
-    faBasketShopping // <--- AGREGAR SI FALTA
+    faBasketShopping, // <--- AGREGAR SI FALTA
+    faLocationDot, 
+    faRotate, 
+    faCheckCircle,
+    faPhone, 
+    faMapMarkerAlt, 
+    faMoneyBillWave,
+    faMotorcycle,
+    faSearch, 
+    faEdit,
+    faBell
 } from '@fortawesome/free-solid-svg-icons';
 
 /* --- 2. Agregarlos a la librería --- */
@@ -31,7 +41,7 @@ library.add(
     faArrowRightFromBracket, faBoxOpen, faShoppingCart, 
     faCheck, faCashRegister, faClipboardList, faTimes, 
     faPrint,
-    faBasketShopping
+    faBasketShopping, faLocationDot, faRotate, faCheckCircle, faPhone, faMapMarkerAlt, faMoneyBillWave, faMotorcycle, faSearch, faEdit,faBell
 );
 
 import 'bootstrap/dist/css/bootstrap.min.css'; 

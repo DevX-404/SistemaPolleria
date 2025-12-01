@@ -80,3 +80,30 @@ exports.eliminarProducto = async (req, res) => {
         res.status(500).json({ message: 'Error interno del servidor al desactivar producto.' });
     }
 };
+
+// Agregar esta función para obtener categorías únicas existentes
+exports.obtenerCategorias = async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT DISTINCT categoria FROM productos ORDER BY categoria');
+        const categorias = rows.map(r => r.categoria);
+        res.json(categorias);
+    } catch (e) { res.status(500).json({message: 'Error'}); }
+};
+
+// Modificar crearProducto para leer req.file
+exports.crearProducto = async (req, res) => {
+    try {
+        // Multer pone la info del archivo en req.file y los campos de texto en req.body
+        const { nombre, descripcion, precio, categoria, stock } = req.body;
+        const imagen_path = req.file ? req.file.filename : 'default.jpg'; // Nombre generado
+
+        const [result] = await pool.execute(
+            'INSERT INTO productos (nombre, descripcion, precio, categoria, imagen_path, stock) VALUES (?, ?, ?, ?, ?, ?)',
+            [nombre, descripcion, precio, categoria, imagen_path, stock]
+        );
+        res.status(201).json({ message: 'Producto creado' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al crear' });
+    }
+};

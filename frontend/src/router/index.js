@@ -3,13 +3,22 @@ import { createRouter, createWebHistory } from 'vue-router';
 // Importamos Layouts y Vistas usando rutas relativas
 import AdminLayout from '../layouts/AdminLayout.vue';
 import Login from '../views/Auth/Login.vue';
+import PublicLayout from '../layouts/PublicLayout.vue';
+import LandingPage from '../views/Web/LandingPage.vue';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      component: PublicLayout,
+      children: [
+        {
+          path: '', // Ruta vacía = /
+          name: 'Home',
+          component: LandingPage
+        }
+      ]
     },
     {
       path: '/login',
@@ -36,7 +45,7 @@ const router = createRouter({
             path: 'pedidos', 
             name: 'PedidosList',
             // Si aun no creamos esta vista, usa VentasPOS temporalmente o crea un archivo vacio
-            component: () => import('../views/Admin/VentasPOS.vue'), 
+            component: () => import('../views/Admin/PedidosGestion.vue'), 
         },
         {
           path: 'productos',

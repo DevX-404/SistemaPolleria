@@ -3,6 +3,8 @@ const cors = require('cors');
 const { checkConnection } = require('./config/db');
 const productosRoutes = require('./routes/productosRoutes');
 const pedidosRoutes = require('./routes/pedidosRoutes');
+const clientesRoutes = require('./routes/clientesRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -15,6 +17,8 @@ app.use(express.json()); // Habilita el parsing de JSON en el body de las petici
 // Rutas
 app.use('/api/productos', productosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

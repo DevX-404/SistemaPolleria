@@ -248,65 +248,45 @@ body {
     .main-content { margin-left: 0; width: 100%; }
 }
 
-/* --- ESTILOS DE IMPRESIÓN (CORREGIDO V2) --- */
+/* --- ESTILOS DE IMPRESIÓN (VERSIÓN FINAL) --- */
 @media print {
-    /* 1. Ocultar todo por defecto */
-    body * {
-        visibility: hidden;
-        height: 0; /* Colapsar espacio */
-        overflow: hidden;
-    }
-
-    /* 2. Resetear el body para que sea una hoja en blanco */
+    /* 1. Ocultamos todo visualmente */
     body {
+        visibility: hidden;
         background-color: white !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        height: auto !important;
-        width: 100% !important;
-        position: static !important;
-        overflow: visible !important;
     }
 
-    /* 3. Mostrar SOLO el ticket */
+    /* 2. Forzamos que el ticket (y todo su contenido) sea visible */
     #ticket-print, #ticket-print * {
         visibility: visible !important;
-        height: auto !important; /* Recuperar altura */
-        overflow: visible !important;
-        display: block !important;
     }
 
-    /* 4. Estilo de la Boleta */
+    /* 3. Posicionamos el ticket al inicio de la hoja */
     #ticket-print {
+        display: block !important; /* Anula el display:none del HTML */
         position: absolute !important;
         left: 0 !important;
         top: 0 !important;
-        
-        /* Ajuste clave: Ancho fijo para impresora térmica */
-        width: 300px !important; /* Equivalente aprox a 80mm */
-        
-        /* Márgenes internos para que no se pegue al borde */
-        padding: 10px !important; 
-        
-        /* Asegurar fondo blanco */
-        background-color: white !important;
-        
-        /* Fuente legible y nítida */
-        font-family: 'Courier New', Courier, monospace !important;
-        font-size: 14px !important;
-        color: black !important;
-        line-height: 1.2 !important;
+        width: 100% !important; /* Ocupa el ancho disponible */
+        max-width: 300px !important; /* Limitamos ancho para que parezca ticket */
+        margin: 0 !important;
+        padding: 10px !important;
     }
 
-    /* Ajustes finos para tablas dentro del ticket */
+    /* 4. Ajustes para textos y tablas dentro del ticket */
     #ticket-print table {
         width: 100% !important;
+        border-collapse: collapse !important;
     }
-    #ticket-print td, #ticket-print th {
-        padding: 2px 0 !important;
+    
+    #ticket-print td, 
+    #ticket-print th {
+        padding: 4px 0 !important; /* Espacio para que no se vea apretado */
     }
-    #ticket-print .dashed-line {
-        border-top: 1px dashed black !important;
-        margin: 8px 0 !important;
+
+    #ticket-print p, 
+    #ticket-print span, 
+    #ticket-print div {
+        color: #000 !important; /* Texto negro puro */
     }
 }

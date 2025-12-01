@@ -94,6 +94,7 @@
                 </div>
                 <div class="modal-body">
                     <form @submit.prevent="guardarProducto">
+                        
                         <div class="mb-3">
                             <label class="form-label fw-bold small text-muted">Nombre del Producto</label>
                             <input type="text" class="form-control" v-model="productoForm.nombre" placeholder="Ej: Pollo a la Brasa" required>
@@ -104,14 +105,21 @@
                                 <label class="form-label fw-bold small text-muted">Precio (S/)</label>
                                 <input type="number" step="0.01" class="form-control" v-model="productoForm.precio" required>
                             </div>
+                            
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold small text-muted">Categoría</label>
-                                <select class="form-select" v-model="productoForm.categoria" required>
-                                    <option value="Pollo">Pollo</option>
-                                    <option value="Combo">Combo</option>
-                                    <option value="Bebida">Bebida</option>
-                                    <option value="Extra">Extra</option>
-                                </select>
+                                <div class="input-group">
+                                    <select class="form-select" v-model="productoForm.categoria" v-if="!nuevaCategoriaMode" required>
+                                        <option value="" disabled>Seleccionar...</option>
+                                        <option v-for="cat in listaCategorias" :key="cat" :value="cat">{{ cat }}</option>
+                                    </select>
+                                    
+                                    <input type="text" class="form-control" v-model="productoForm.categoria" v-else placeholder="Nueva Categoría..." required>
+                                    
+                                    <button class="btn btn-outline-secondary" type="button" @click="toggleNuevaCategoria" title="Agregar nueva">
+                                        {{ nuevaCategoriaMode ? 'Lista' : '+ Nueva' }}
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -122,9 +130,13 @@
 
                         <div class="row">
                              <div class="col-md-8 mb-3">
-                                <label class="form-label fw-bold small text-muted">Nombre de Imagen (en public/img)</label>
-                                <input type="text" class="form-control" v-model="productoForm.imagen_path" placeholder="ej: pollo.jpg">
+                                <label class="form-label fw-bold small text-muted">Imagen del Producto</label>
+                                <input type="file" class="form-control" @change="handleFileUpload" accept="image/*">
+                                <div v-if="productoForm.imagen_path && !archivoImagen" class="mt-1">
+                                    <small class="text-muted">Imagen actual: {{ productoForm.imagen_path }}</small>
+                                </div>
                              </div>
+
                              <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold small text-muted">Stock</label>
                                 <input type="number" class="form-control" v-model="productoForm.stock" placeholder="Opcional">
@@ -133,7 +145,9 @@
                         
                         <div class="modal-footer border-0 px-0 pb-0">
                             <button type="button" class="btn btn-light text-muted" @click="cerrarModal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            <button type="submit" class="btn btn-primary">
+                                {{ productoForm.id_producto ? 'Actualizar Datos' : 'Guardar Producto' }}
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -150,44 +164,88 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api/productos'; 
 const productos = ref([]);
-const loading = ref(true); // Estado de carga
+const loading = ref(true);
 const mostrarModal = ref(false);
+
+// Datos para categorías dinámicas
+const listaCategorias = ref(['Pollo', 'Combo', 'Bebida', 'Extra', 'Guarnición']); 
+const nuevaCategoriaMode = ref(false);
+
+// Archivo de imagen seleccionado
+const archivoImagen = ref(null);
+
 const productoForm = ref({
   id_producto: null,
   nombre: '',
   descripcion: '',
   precio: '',
-  categoria: 'Pollo',
+  categoria: '',
   imagen_path: '', 
   stock: null
 });
 
-// Obtener Productos
+// --- Cargar Datos ---
 const cargarProductos = async () => {
   loading.value = true;
   try {
     const response = await axios.get(API_URL);
     productos.value = response.data;
+    
+    // (Opcional) Extraer categorías únicas de los productos existentes para llenar la lista
+    const cats = [...new Set(response.data.map(p => p.categoria))];
+    if(cats.length > 0) listaCategorias.value = cats;
+
   } catch (error) {
     console.error('Error cargando productos:', error);
-    // Opcional: Mostrar alerta de error de conexión
   } finally {
     loading.value = false;
   }
 };
 
+// --- Manejo de Archivo ---
+const handleFileUpload = (event) => {
+    archivoImagen.value = event.target.files[0];
+};
+
+const toggleNuevaCategoria = () => {
+    nuevaCategoriaMode.value = !nuevaCategoriaMode;
+    productoForm.value.categoria = ''; // Limpiar selección al cambiar modo
+};
+
+// --- Guardar (CREATE / UPDATE con FormData) ---
 const guardarProducto = async () => {
+    // Usamos FormData porque vamos a enviar un archivo binario (imagen)
+    const formData = new FormData();
+    formData.append('nombre', productoForm.value.nombre);
+    formData.append('descripcion', productoForm.value.descripcion || '');
+    formData.append('precio', productoForm.value.precio);
+    formData.append('categoria', productoForm.value.categoria);
+    
+    // Stock puede ser nulo
+    if(productoForm.value.stock !== null && productoForm.value.stock !== '') {
+        formData.append('stock', productoForm.value.stock);
+    }
+
+    // Solo adjuntamos la imagen si el usuario seleccionó una nueva
+    if (archivoImagen.value) {
+        formData.append('imagen', archivoImagen.value);
+    }
+
     try {
         if (productoForm.value.id_producto) {
-            await axios.put(`${API_URL}/${productoForm.value.id_producto}`, productoForm.value);
+            // ACTUALIZAR
+            await axios.put(`${API_URL}/${productoForm.value.id_producto}`, formData);
         } else {
-            await axios.post(API_URL, productoForm.value);
+            // CREAR
+            await axios.post(API_URL, formData);
         }
+        
         cerrarModal();
         cargarProductos();
+        
     } catch (error) {
         console.error('Error guardando:', error);
-        alert('Error al guardar. Verifica que el servidor Backend esté corriendo.');
+        alert('Error al guardar. Asegúrate de que el Backend soporte subida de archivos.');
     }
 }
 
@@ -203,19 +261,33 @@ const eliminarProducto = async (id) => {
 }
 
 const abrirModalCrear = () => {
-    productoForm.value = { id_producto: null, nombre: '', descripcion: '', precio: '', categoria: 'Pollo', imagen_path: '', stock: null };
+    // Resetear formulario
+    productoForm.value = { 
+        id_producto: null, 
+        nombre: '', 
+        descripcion: '', 
+        precio: '', 
+        categoria: '', 
+        imagen_path: '', 
+        stock: null 
+    };
+    archivoImagen.value = null; // Limpiar archivo previo
+    nuevaCategoriaMode.value = false;
     mostrarModal.value = true;
 };
 
 const editarProducto = (producto) => {
     productoForm.value = { ...producto }; 
+    archivoImagen.value = null; // Limpiar archivo previo
+    nuevaCategoriaMode.value = false;
     mostrarModal.value = true;
 };
 
 const cerrarModal = () => { mostrarModal.value = false; };
 
 const getImgPath = (path) => {
-    if (!path) return '/img/default.jpg'; // Asegúrate de tener una imagen default.jpg
+    if (!path) return '/img/default.jpg';
+    // Asume que las imágenes subidas van a public/img o que el backend sirve estáticos
     return `/img/${path}`; 
 }
 
@@ -225,7 +297,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Estilos específicos para este componente si se requiere extra */
 .avatar {
     transition: transform 0.2s;
 }

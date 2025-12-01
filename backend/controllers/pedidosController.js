@@ -124,28 +124,36 @@ exports.crearPedido = async (req, res) => {
     }
 };
 
-// Listar Pedidos (Para el Dashboard o Cocina)
+// LISTAR PEDIDOS (Con datos del cliente)
 exports.obtenerPedidos = async (req, res) => {
     try {
         const [pedidos] = await pool.query(`
-            SELECT p.*, c.nombre as nombre_cliente, c.direccion 
+            SELECT p.*, c.nombre as nombre_cliente, c.direccion, c.telefono, u.nombre as nombre_vendedor 
             FROM pedidos p 
             LEFT JOIN clientes c ON p.id_cliente = c.id_cliente 
-            ORDER BY p.fecha_hora DESC LIMIT 50
+            LEFT JOIN usuarios u ON p.id_vendedor = u.id_usuario
+            WHERE p.estado != 'entregado_pagado' AND p.estado != 'cancelado' -- Opcional: traer solo activos
+            ORDER BY p.fecha_hora ASC  -- <--- CAMBIO AQUÍ
+            LIMIT 50
         `);
         res.json(pedidos);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Error al obtener pedidos' });
     }
 };
 
+// ACTUALIZAR ESTADO (Flujo de vida del pedido)
 exports.actualizarEstado = async (req, res) => {
     try {
         const { id } = req.params;
-        const { estado } = req.body;
+        const { estado } = req.body; // Ej: 'en_camino', 'entregado'
+        
         await pool.execute('UPDATE pedidos SET estado = ? WHERE id_pedido = ?', [estado, id]);
-        res.json({ message: 'Estado actualizado' });
+        
+        res.json({ message: 'Estado actualizado correctamente', id_pedido: id, nuevo_estado: estado });
     } catch (error) {
-        res.status(500).json({ message: 'Error' });
+        console.error(error);
+        res.status(500).json({ message: 'Error al actualizar estado' });
     }
 };
