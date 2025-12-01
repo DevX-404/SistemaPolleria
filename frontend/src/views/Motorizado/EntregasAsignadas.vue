@@ -111,7 +111,7 @@ const confirmarEntrega = async (pedido) => {
 
     try {
         await axios.put(`${API_URL}/${pedido.id_pedido}`, { estado: 'entregado_pagado' });
-        // Actualizar localmente para inmediatez
+        // Actualizar localmente 
         pedido.estado = 'entregado_pagado';
         alert("✅ Entrega registrada.");
     } catch (error) {

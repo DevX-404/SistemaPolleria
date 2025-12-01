@@ -32,7 +32,6 @@ const password = ref('');
 const router = useRouter();
 
 const handleLogin = () => {
-  // Simulación de login exitoso
   console.log('Intentando iniciar sesión con:', email.value, password.value);
   router.push('/admin/dashboard'); 
 };

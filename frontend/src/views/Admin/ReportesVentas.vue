@@ -124,11 +124,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
-// Usamos iconos ya existentes en tu main.js para evitar errores
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const ventas = ref([]);
-// Fechas por defecto: Hoy
 const hoy = new Date().toISOString().split('T')[0];
 const filtros = ref({
   inicio: hoy,
@@ -138,10 +136,7 @@ const filtros = ref({
 // Cargar datos del Backend
 const cargarVentas = async () => {
     try {
-        // CAMBIO: Usamos el endpoint específico '/reporte'
         const res = await axios.get('http://localhost:3000/api/pedidos/reporte');
-        
-        // Ya no necesitamos filtrar por estado aquí porque el backend ya lo hace
         ventas.value = res.data;
         
     } catch (e) { 
@@ -153,8 +148,6 @@ const cargarVentas = async () => {
 const ventasFiltradas = computed(() => {
     if (!filtros.value.inicio || !filtros.value.fin) return [];
 
-    // Ajustamos las fechas para cubrir todo el día (00:00 a 23:59)
-    // Usamos replace(/-/g, '/') para evitar problemas de zona horaria en algunos navegadores al parsear
     const start = new Date(filtros.value.inicio + 'T00:00:00').getTime();
     const end = new Date(filtros.value.fin + 'T23:59:59').getTime();
 
@@ -164,7 +157,7 @@ const ventasFiltradas = computed(() => {
     });
 });
 
-// Cálculos Automáticos (Totales)
+// Cálculos Automáticos 
 const reporte = computed(() => {
     const lista = ventasFiltradas.value;
     const total = lista.reduce((acc, v) => acc + parseFloat(v.total_final), 0);

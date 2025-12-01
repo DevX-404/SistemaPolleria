@@ -235,7 +235,7 @@ const enviarPedido = async () => {
         total_final: total,
         metodo_pago: pago.value.metodo,
         referencia_pago: refPago,
-        id_vendedor: 1, // Usuario Web
+        id_vendedor: 1, 
         productos: carrito.value,
         datos_cliente_delivery: cliente.value
     };

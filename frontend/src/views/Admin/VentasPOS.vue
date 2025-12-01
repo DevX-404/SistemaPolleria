@@ -262,7 +262,7 @@ const costoDelivery = ref(5.00);
 // --- ESTADOS DE VENTA Y PAGO ---
 const mostrarModal = ref(false);
 const formVenta = ref({
-    tipoVenta: 'mesa', // Valor por defecto corregido a 'mesa'
+    tipoVenta: 'mesa', 
     nombre: '',
     dni: '',
     telefono: '',
@@ -312,7 +312,7 @@ const abrirModalPago = () => {
     // Resetear pagos al abrir
     pago.value = {
         metodo: 'efectivo',
-        montoRecibido: 0, // Se puede poner totalFinal.value para agilizar
+        montoRecibido: 0, 
         vuelto: -totalFinal.value, 
         referencia: ''
     };
@@ -368,8 +368,8 @@ const finalizarVenta = async () => {
       total_neto: totalNeto.value,
       costo_delivery: formVenta.value.tipoVenta === 'delivery' ? costoDelivery.value : 0,
       total_final: totalFinal.value,
-      metodo_pago: pago.value.metodo, // Nuevo campo
-      referencia_pago: refPagoFinal,  // Nuevo campo
+      metodo_pago: pago.value.metodo, 
+      referencia_pago: refPagoFinal, 
       id_vendedor: 1, 
       productos: carrito.value,
       datos_cliente_delivery: clienteFinal

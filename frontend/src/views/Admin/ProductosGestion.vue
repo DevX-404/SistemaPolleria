@@ -197,7 +197,6 @@ const cargarProductos = async () => {
     const response = await axios.get(API_URL);
     productos.value = response.data;
 
-    // (Opcional) Extraer categorías únicas de los productos existentes para llenar la lista
     const cats = [...new Set(response.data.map(p => p.categoria))];
     if (cats.length > 0) listaCategorias.value = cats;
 
@@ -220,7 +219,7 @@ const toggleNuevaCategoria = () => {
 
 // --- Guardar (CREATE / UPDATE con FormData) ---
 const guardarProducto = async () => {
-  // Usamos FormData porque vamos a enviar un archivo binario (imagen)
+  // Usamos FormData porque vamos a enviar un archivo binario 
   const formData = new FormData();
   formData.append('nombre', productoForm.value.nombre);
   formData.append('descripcion', productoForm.value.descripcion || '');
@@ -277,14 +276,14 @@ const abrirModalCrear = () => {
     imagen_path: '',
     stock: null
   };
-  archivoImagen.value = null; // Limpiar archivo previo
+  archivoImagen.value = null; 
   nuevaCategoriaMode.value = false;
   mostrarModal.value = true;
 };
 
 const editarProducto = (producto) => {
   productoForm.value = { ...producto };
-  archivoImagen.value = null; // Limpiar archivo previo
+  archivoImagen.value = null;
   nuevaCategoriaMode.value = false;
   mostrarModal.value = true;
 };
@@ -293,7 +292,6 @@ const cerrarModal = () => { mostrarModal.value = false; };
 
 const getImgPath = (path) => {
   if (!path) return '/img/default.jpg';
-  // Asume que las imágenes subidas van a public/img o que el backend sirve estáticos
   return `/img/${path}`;
 }
 

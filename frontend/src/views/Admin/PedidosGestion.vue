@@ -173,7 +173,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const API_URL = 'http://localhost:3000/api/pedidos';
 const pedidos = ref([]);
-const filtro = ref('activos'); // Por defecto visión general
+const filtro = ref('activos'); 
 const loading = ref(false);
 let intervalId = null;
 
@@ -225,8 +225,6 @@ const pedidosFiltrados = computed(() => {
         });
     }
     // 3. Estados específicos
-    // 'pendiente' -> En Cocina
-    // 'en_camino' -> Por Cobrar/En Ruta
     return pedidos.value.filter(p => p.estado === filtro.value);
 });
 

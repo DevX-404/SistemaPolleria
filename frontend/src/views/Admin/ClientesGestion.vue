@@ -114,7 +114,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
-// Importamos iconos extra necesarios (asegúrate de agregarlos en main.js: faSearch, faEdit)
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const clientes = ref([]);

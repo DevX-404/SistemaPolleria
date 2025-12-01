@@ -153,11 +153,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-// Asegúrate de tener los iconos
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const stats = ref({
-    ventas_hoy: 0,   // Inicializar en 0 numérico
+    ventas_hoy: 0,   
     pedidos_hoy: 0,
     pendientes: 0,
     top_productos: []
@@ -166,9 +165,7 @@ const stats = ref({
 const cargarStats = async () => {
     try {
         const res = await axios.get('http://localhost:3000/api/stats/dashboard');
-        
-        // CORRECCIÓN: Asegurar que sean números antes de asignarlos
-        // MySQL a veces devuelve decimales como strings "55.00"
+
         stats.value = {
             ventas_hoy: parseFloat(res.data.ventas_hoy) || 0,
             pedidos_hoy: parseInt(res.data.pedidos_hoy) || 0,
@@ -183,7 +180,6 @@ const cargarStats = async () => {
 
 onMounted(() => {
     cargarStats();
-    // Actualizar cada minuto
     setInterval(cargarStats, 60000);
 });
 </script>
