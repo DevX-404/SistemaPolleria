@@ -19,14 +19,19 @@ import {
     faShoppingCart, 
     faCheck,
     faCashRegister,   // <--- NUEVO (Caja)
-    faClipboardList   // <--- NUEVO (Lista Pedidos)
+    faClipboardList,   // <--- NUEVO (Lista Pedidos)
+    faTimes, // <--- AGREGAR
+    faPrint,  // <--- AGREGAR
+    faBasketShopping // <--- AGREGAR SI FALTA
 } from '@fortawesome/free-solid-svg-icons';
 
 /* --- 2. Agregarlos a la librería --- */
 library.add(
     faHome, faUtensils, faUsers, faTruckFast, faChartBar, 
     faArrowRightFromBracket, faBoxOpen, faShoppingCart, 
-    faCheck, faCashRegister, faClipboardList
+    faCheck, faCashRegister, faClipboardList, faTimes, 
+    faPrint,
+    faBasketShopping
 );
 
 import 'bootstrap/dist/css/bootstrap.min.css'; 

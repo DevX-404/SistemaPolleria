@@ -45,19 +45,13 @@
                
                <div class="p-3 bg-light border-bottom">
                   <div class="btn-group w-100" role="group">
-                     <input type="radio" class="btn-check" name="tipoVenta" id="local" value="local" v-model="tipoVenta">
+                     <input type="radio" class="btn-check" name="tipoVenta" id="local" value="local" v-model="formVenta.tipoVenta">
                      <label class="btn btn-outline-primary" for="local">🏢 Local</label>
 
-                     <input type="radio" class="btn-check" name="tipoVenta" id="delivery" value="delivery" v-model="tipoVenta">
+                     <input type="radio" class="btn-check" name="tipoVenta" id="delivery" value="delivery" v-model="formVenta.tipoVenta">
                      <label class="btn btn-outline-primary" for="delivery">🛵 Delivery</label>
                   </div>
-
-                  <div v-if="tipoVenta === 'delivery'" class="mt-3 animate__animated animate__fadeIn">
-                     <input type="text" class="form-control form-control-sm mb-2" placeholder="Teléfono" v-model="clienteDelivery.telefono">
-                     <input type="text" class="form-control form-control-sm mb-2" placeholder="Nombre Cliente" v-model="clienteDelivery.nombre">
-                     <input type="text" class="form-control form-control-sm" placeholder="Dirección Exacta" v-model="clienteDelivery.direccion">
                   </div>
-               </div>
 
                <div class="flex-grow-1 overflow-auto p-3 custom-scroll">
                   <div v-if="carrito.length === 0" class="text-center text-muted mt-5">
@@ -84,7 +78,7 @@
                      <span>Subtotal:</span>
                      <span>S/ {{ totalNeto.toFixed(2) }}</span>
                   </div>
-                  <div v-if="tipoVenta === 'delivery'" class="d-flex justify-content-between mb-2 text-muted">
+                  <div v-if="formVenta.tipoVenta === 'delivery'" class="d-flex justify-content-between mb-2 text-muted">
                      <span>Delivery:</span>
                      <span>S/ {{ costoDelivery.toFixed(2) }}</span>
                   </div>
@@ -93,7 +87,7 @@
                      <span class="fs-4 fw-bold text-primary">S/ {{ totalFinal.toFixed(2) }}</span>
                   </div>
 
-                  <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm" @click="procesarPedido" :disabled="carrito.length === 0">
+                  <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm" @click="abrirModalPago" :disabled="carrito.length === 0">
                      CONFIRMAR PEDIDO (S/ {{ totalFinal.toFixed(2) }})
                   </button>
                </div>
@@ -103,34 +97,124 @@
       </div>
 
     </div>
+
+    <div v-if="mostrarModal" class="modal fade show d-block" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(2px);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">📝 Datos del Cliente</h5>
+                    <button type="button" class="btn-close btn-close-white" @click="mostrarModal = false"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">DNI / RUC</label>
+                            <input type="number" class="form-control" v-model="formVenta.dni" placeholder="Opcional">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Nombre Cliente</label>
+                            <input type="text" class="form-control" v-model="formVenta.nombre" placeholder="Público General">
+                        </div>
+                        
+                        <div v-if="formVenta.tipoVenta === 'delivery'" class="col-12 mt-3 p-3 bg-light rounded border">
+                            <h6 class="text-primary fw-bold mb-3 small"><font-awesome-icon icon="truck-fast" /> Datos de Entrega</h6>
+                            <div class="mb-2">
+                                <label class="form-label small">Teléfono</label>
+                                <input type="text" class="form-control form-control-sm" v-model="formVenta.telefono">
+                            </div>
+                            <div>
+                                <label class="form-label small">Dirección Exacta</label>
+                                <input type="text" class="form-control form-control-sm" v-model="formVenta.direccion">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @click="mostrarModal = false">Cancelar</button>
+                    <button class="btn btn-success fw-bold" @click="finalizarVenta">
+                        <font-awesome-icon icon="print" /> IMPRIMIR TICKET
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticket-print" style="display:none;">
+        <div style="font-family: 'Courier New', monospace; font-size: 12px; width: 100%;">
+            <div class="text-center mb-2">
+                <h3 style="margin:0; font-weight:bold;">POLLERIA EL SABROSÓN</h3>
+                <p style="margin:0;">RUC: 20123456789</p>
+                <p style="margin:0;">Av. Siempre Viva 123</p>
+            </div>
+            
+            <p style="border-top: 1px dashed #000; margin: 5px 0;"></p>
+            
+            <div style="display: flex; justify-content: space-between;">
+                <span><strong>Ticket:</strong> #{{ datosTicket.id }}</span>
+                <span>{{ new Date().toLocaleTimeString() }}</span>
+            </div>
+            <div><strong>Cliente:</strong> {{ datosTicket.nombre }}</div>
+            <div v-if="datosTicket.dni"><strong>DNI:</strong> {{ datosTicket.dni }}</div>
+            <div v-if="datosTicket.tipo === 'delivery'"><strong>Dir:</strong> {{ datosTicket.direccion }}</div>
+
+            <p style="border-top: 1px dashed #000; margin: 5px 0;"></p>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr v-for="item in datosTicket.items" :key="item.id_producto">
+                    <td style="padding: 2px 0;">{{ item.cantidad }} x {{ item.nombre }}</td>
+                    <td style="text-align: right;">{{ (item.precio * item.cantidad).toFixed(2) }}</td>
+                </tr>
+            </table>
+
+            <p style="border-top: 1px dashed #000; margin: 5px 0;"></p>
+
+            <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: bold;">
+                <span>TOTAL:</span>
+                <span>S/ {{ datosTicket.total }}</span>
+            </div>
+            
+            <br>
+            <div class="text-center">
+                <p>¡Gracias por su compra!</p>
+                <small>Wifi: Pollos123</small>
+            </div>
+        </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import axios from 'axios';
 
-// Estado
+// Estado Base
 const productos = ref([]);
 const carrito = ref([]);
 const categorias = ref(['Todas', 'Pollo', 'Combo', 'Bebida', 'Extra']);
 const filtroCategoria = ref('Todas');
 const busqueda = ref('');
+const costoDelivery = ref(5.00); 
 
-// Datos Venta
-const tipoVenta = ref('local'); // 'local' o 'delivery'
-const clienteDelivery = ref({ nombre: '', telefono: '', direccion: '', referencia: '' });
-const costoDelivery = ref(5.00); // Costo fijo ejemplo
+// --- NUEVOS ESTADOS ---
+const mostrarModal = ref(false);
+const formVenta = ref({
+    tipoVenta: 'local',
+    nombre: '',
+    dni: '',
+    telefono: '',
+    direccion: ''
+});
+const datosTicket = ref({ // Datos fijos para el ticket impreso
+    id: '---', items: [], total: '0.00', nombre: '', dni: '', direccion: '', tipo: ''
+});
 
 // Cargar Productos
 const cargarProductos = async () => {
-   try {
-      const res = await axios.get('http://localhost:3000/api/productos');
-      productos.value = res.data;
-   } catch (e) { console.error(e); }
+   try { const res = await axios.get('http://localhost:3000/api/productos'); productos.value = res.data; } catch (e) {}
 };
 
-// Computed: Filtrado
+// Computed
 const productosFiltrados = computed(() => {
    return productos.value.filter(p => {
       const matchCat = filtroCategoria.value === 'Todas' || p.categoria === filtroCategoria.value;
@@ -139,62 +223,100 @@ const productosFiltrados = computed(() => {
    });
 });
 
-// Computed: Totales
 const totalNeto = computed(() => carrito.value.reduce((acc, item) => acc + (item.precio * item.cantidad), 0));
 const totalFinal = computed(() => {
-   return tipoVenta.value === 'delivery' ? totalNeto.value + costoDelivery.value : totalNeto.value;
+   return formVenta.value.tipoVenta === 'delivery' ? totalNeto.value + costoDelivery.value : totalNeto.value;
 });
 
 // Acciones Carrito
 const agregarAlCarrito = (prod) => {
    const existente = carrito.value.find(item => item.id_producto === prod.id_producto);
-   if (existente) {
-      existente.cantidad++;
-      existente.subtotal = existente.cantidad * existente.precio;
-   } else {
-      carrito.value.push({
-         id_producto: prod.id_producto,
-         nombre: prod.nombre,
-         precio: parseFloat(prod.precio),
-         cantidad: 1,
-         subtotal: parseFloat(prod.precio)
-      });
-   }
+   if (existente) existente.cantidad++;
+   else carrito.value.push({ id_producto: prod.id_producto, nombre: prod.nombre, precio: parseFloat(prod.precio), cantidad: 1 });
 };
 
-const eliminarDelCarrito = (index) => {
-   carrito.value.splice(index, 1);
+const eliminarDelCarrito = (idx) => carrito.value.splice(idx, 1);
+
+// --- LÓGICA DEL FLUJO DE VENTA ---
+
+// 1. Abrir Modal (Reemplaza el proceso directo anterior)
+const abrirModalPago = () => {
+    // Preservar tipo de venta seleccionado en el switch, limpiar el resto
+    const tipoActual = formVenta.value.tipoVenta;
+    formVenta.value = { 
+        tipoVenta: tipoActual, 
+        nombre: '', 
+        dni: '', 
+        telefono: '', 
+        direccion: '' 
+    };
+    mostrarModal.value = true;
 };
 
-// Procesar Pedido (Enviar al Backend)
-const procesarPedido = async () => {
-   if (tipoVenta.value === 'delivery' && (!clienteDelivery.value.telefono || !clienteDelivery.value.direccion)) {
-      alert('Por favor complete los datos de delivery');
-      return;
-   }
+// Paso 2: Finalizar, Guardar en BD e Imprimir
+const finalizarVenta = async () => {
+    // A. Validación Delivery
+    if (formVenta.value.tipoVenta === 'delivery' && !formVenta.value.direccion) {
+        alert('Para delivery, la dirección es obligatoria.');
+        return;
+    }
 
-   const payload = {
-      id_cliente: null, // Opcional si es local anonimo
-      tipo_venta: tipoVenta.value,
+    // B. Preparar datos del cliente
+    const clienteFinal = {
+        nombre: formVenta.value.nombre || 'Cliente General',
+        dni: formVenta.value.dni || '',
+        telefono: formVenta.value.telefono || '',
+        direccion: formVenta.value.direccion || ''
+    };
+
+    // C. [CORRECCIÓN] Llenar el ticket VISUALMENTE ahora (con ID temporal)
+    // Esto asegura que la boleta NO salga vacía si el servidor falla
+    datosTicket.value = {
+        id: 'Pendiente...', // Se actualizará si el servidor responde bien
+        items: [...carrito.value],
+        total: totalFinal.value.toFixed(2),
+        nombre: clienteFinal.nombre,
+        dni: clienteFinal.dni,
+        direccion: clienteFinal.direccion,
+        tipo: formVenta.value.tipoVenta
+    };
+
+    const payload = {
+      id_cliente: null, 
+      tipo_venta: formVenta.value.tipoVenta,
       total_neto: totalNeto.value,
-      costo_delivery: tipoVenta.value === 'delivery' ? costoDelivery.value : 0,
+      costo_delivery: formVenta.value.tipoVenta === 'delivery' ? costoDelivery.value : 0,
       total_final: totalFinal.value,
-      metodo_pago: 'efectivo', // Podrías agregar un selector de pago
-      id_vendedor: 1, // ID hardcodeado por ahora (luego vendrá del login)
+      metodo_pago: 'efectivo',
+      id_vendedor: 1, 
       productos: carrito.value,
-      datos_cliente_delivery: tipoVenta.value === 'delivery' ? clienteDelivery.value : null
+      datos_cliente_delivery: clienteFinal
    };
 
    try {
-      await axios.post('http://localhost:3000/api/pedidos', payload);
-      alert('✅ Pedido Registrado Correctamente');
-      // Limpiar
+      // D. Enviar al Backend
+      const res = await axios.post('http://localhost:3000/api/pedidos', payload);
+      
+      // E. Si hay éxito, actualizamos SOLO el ID del ticket
+      datosTicket.value.id = res.data.id_pedido; // ¡Aquí ponemos el ID real!
+
+      // F. Cerrar modal y limpiar carrito
+      mostrarModal.value = false;
       carrito.value = [];
-      clienteDelivery.value = { nombre: '', telefono: '', direccion: '', referencia: '' };
-      tipoVenta.value = 'local';
+      formVenta.value = { tipoVenta: 'local', nombre: '', dni: '', telefono: '', direccion: '' }; // Resetear formulario
+
+      // G. Imprimir
+      await nextTick();
+      setTimeout(() => {
+          window.print();
+      }, 500);
+
    } catch (error) {
-      console.error(error);
-      alert('❌ Error al procesar pedido');
+      console.error("Error en venta:", error);
+      // Opcional: Imprimir igual aunque falle (útil para depurar) o mostrar alerta
+      alert('Hubo un problema de conexión, pero intentaremos imprimir la constancia.');
+      mostrarModal.value = false;
+      setTimeout(() => window.print(), 500); 
    }
 };
 
@@ -204,6 +326,7 @@ onMounted(() => cargarProductos());
 </script>
 
 <style scoped>
+/* Tus estilos originales se mantienen */
 .product-card {
    cursor: pointer;
    transition: transform 0.2s, border-color 0.2s;

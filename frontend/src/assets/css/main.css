@@ -38,65 +38,88 @@ body {
    2. ESTRUCTURA DEL LAYOUT (Sidebar y Contenido)
    --------------------------------------------------------- */
 
-/* Sidebar Fijo */
+/* --- SIDEBAR MEJORADO --- */
 .sidebar {
-    width: 260px;
+    width: 280px; /* Un poco más ancho para presencia */
     background-color: var(--sidebar-bg);
     color: var(--sidebar-text);
-    padding: 1.5rem 0;
     position: fixed;
     height: 100vh;
     z-index: 1000;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Clave para mandar elementos al fondo */
+    transition: all 0.3s ease;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1); /* Sombra para resaltar */
 }
 
 .sidebar-header {
-    padding: 0 2rem 2rem 2rem;
-    font-size: 1.25rem;
-    font-weight: 700;
+    padding: 1.5rem 2rem; /* Espaciado cómodo arriba */
+    font-size: 1.4rem;
+    font-weight: 800;
     color: #fff;
     letter-spacing: -0.5px;
+    border-bottom: 1px solid rgba(255,255,255,0.05); /* Separador sutil */
+    margin-bottom: 1rem;
 }
 
-/* Items del Menú */
-.sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* El menú principal ocupará todo el espacio disponible */
+.sidebar-menu-wrapper {
+    flex-grow: 1; 
+    overflow-y: auto; /* Scroll si la pantalla es muy pequeña */
+    padding: 0 1rem; /* Margen a los lados de los botones */
 }
 
+/* Estilo de los Items más compacto pero con letra más grande */
 .sidebar-menu-item {
-    margin-bottom: 0.25rem;
+    margin-bottom: 4px; /* Menos separación entre items */
 }
 
 .sidebar-menu-item a {
     display: flex;
     align-items: center;
-    padding: 0.75rem 2rem;
-    color: var(--sidebar-text);
+    padding: 0.8rem 1.2rem; /* Padding equilibrado */
+    color: #aeb0ca; /* Color texto suave */
     text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 1rem; /* Letra más grande (antes era 0.9) */
+    border-radius: 8px; /* Bordes redondeados modernos */
     transition: all 0.2s ease;
-    border-left: 3px solid transparent;
 }
 
 .sidebar-menu-item a:hover {
-    color: var(--sidebar-active-text);
-    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: translateX(3px); /* Pequeña animación al pasar mouse */
 }
 
 .sidebar-menu-item a.router-link-active {
-    color: var(--sidebar-active-text);
-    background-color: var(--sidebar-active);
-    border-left-color: var(--primary);
+    background-color: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(62, 151, 255, 0.3); /* Sombra brillante en el activo */
 }
 
 .sidebar-menu-item a .fa-icon {
-    width: 20px;
+    width: 24px; /* Iconos un poco más grandes */
+    font-size: 1.1rem;
     margin-right: 12px;
     text-align: center;
+}
+
+/* Sección de títulos pequeños (OPERACIONES, GESTIÓN) */
+.menu-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #585a6f;
+    font-weight: 700;
+    margin: 1.5rem 0 0.5rem 1.2rem;
+    letter-spacing: 1px;
+}
+
+/* Footer del Sidebar (Para el botón de Salir) */
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    background-color: rgba(0,0,0,0.1); /* Fondo sutilmente más oscuro */
 }
 
 /* Contenido Principal (Desplazado a la derecha) */
@@ -223,4 +246,67 @@ body {
     .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
     .sidebar.active { transform: translateX(0); }
     .main-content { margin-left: 0; width: 100%; }
+}
+
+/* --- ESTILOS DE IMPRESIÓN (CORREGIDO V2) --- */
+@media print {
+    /* 1. Ocultar todo por defecto */
+    body * {
+        visibility: hidden;
+        height: 0; /* Colapsar espacio */
+        overflow: hidden;
+    }
+
+    /* 2. Resetear el body para que sea una hoja en blanco */
+    body {
+        background-color: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        width: 100% !important;
+        position: static !important;
+        overflow: visible !important;
+    }
+
+    /* 3. Mostrar SOLO el ticket */
+    #ticket-print, #ticket-print * {
+        visibility: visible !important;
+        height: auto !important; /* Recuperar altura */
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    /* 4. Estilo de la Boleta */
+    #ticket-print {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        
+        /* Ajuste clave: Ancho fijo para impresora térmica */
+        width: 300px !important; /* Equivalente aprox a 80mm */
+        
+        /* Márgenes internos para que no se pegue al borde */
+        padding: 10px !important; 
+        
+        /* Asegurar fondo blanco */
+        background-color: white !important;
+        
+        /* Fuente legible y nítida */
+        font-family: 'Courier New', Courier, monospace !important;
+        font-size: 14px !important;
+        color: black !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Ajustes finos para tablas dentro del ticket */
+    #ticket-print table {
+        width: 100% !important;
+    }
+    #ticket-print td, #ticket-print th {
+        padding: 2px 0 !important;
+    }
+    #ticket-print .dashed-line {
+        border-top: 1px dashed black !important;
+        margin: 8px 0 !important;
+    }
 }
