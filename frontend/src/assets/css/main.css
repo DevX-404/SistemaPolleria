@@ -1,0 +1,226 @@
+/* frontend/src/assets/css/main.css */
+
+/* 1. VARIABLES (Tema Metronic) */
+:root {
+    --primary: #3E97FF;
+    --primary-hover: #2884EF;
+    --secondary: #F5F8FA;
+    --text-dark: #181C32;
+    --text-muted: #A1A5B7;
+    --bg-body: #F9F9F9;
+    --card-bg: #FFFFFF;
+    --border-color: #EFF2F5;
+    --sidebar-bg: #1E1E2D;
+    --sidebar-text: #9899ac;
+    --sidebar-active: #2B2B40;
+    --sidebar-active-text: #FFFFFF;
+    --radius: 0.75rem;
+    --shadow-sm: 0px 3px 4px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0px 0px 20px 0px rgba(76, 87, 125, 0.02);
+}
+
+body {
+    background-color: var(--bg-body);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-dark);
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* --- CAMBIO IMPORTANTE AQUÍ --- */
+#app {
+    display: block; /* Antes era flex, cámbialo a block */
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* ---------------------------------------------------------
+   2. ESTRUCTURA DEL LAYOUT (Sidebar y Contenido)
+   --------------------------------------------------------- */
+
+/* Sidebar Fijo */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: 1.5rem 0;
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 0 2rem 2rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+/* Items del Menú */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu-item {
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-menu-item a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-menu-item a:hover {
+    color: var(--sidebar-active-text);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-menu-item a.router-link-active {
+    color: var(--sidebar-active-text);
+    background-color: var(--sidebar-active);
+    border-left-color: var(--primary);
+}
+
+.sidebar-menu-item a .fa-icon {
+    width: 20px;
+    margin-right: 12px;
+    text-align: center;
+}
+
+/* Contenido Principal (Desplazado a la derecha) */
+.main-content {
+    margin-left: 260px; /* IMPORTANTE: Deja espacio al sidebar */
+    width: calc(100% - 260px);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar Superior */
+.navbar-top {
+    background-color: #fff;
+    height: 70px;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    z-index: 900;
+}
+
+.navbar-brand-top {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* --- SOLUCIÓN AL PROBLEMA DE LA IMAGEN GIGANTE --- */
+.user-profile-top {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.user-profile-top img {
+    width: 40px;  /* ¡AQUÍ ESTÁ LA SOLUCIÓN! Limitamos el ancho */
+    height: 40px; /* Y la altura */
+    border-radius: 8px; /* Bordes redondeados modernos */
+    object-fit: cover;
+    margin-left: 10px;
+}
+/* --------------------------------------------------------- */
+
+
+/* ---------------------------------------------------------
+   3. ESTILOS VISUALES (Cards, Tablas, Botones)
+   --------------------------------------------------------- */
+
+.container-fluid {
+    padding: 2rem;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    background-color: var(--card-bg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 2rem;
+}
+
+/* Botones */
+.btn {
+    border-radius: 0.45rem;
+    font-weight: 600;
+    padding: 0.55rem 1.25rem;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Tablas */
+.table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+    background-color: transparent;
+    border-bottom: 1px dashed var(--border-color);
+    padding: 1rem 0.5rem;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    padding: 1rem 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    font-weight: 500;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+/* Animaciones */
+.fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.active { transform: translateX(0); }
+    .main-content { margin-left: 0; width: 100%; }
+}
