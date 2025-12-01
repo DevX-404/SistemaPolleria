@@ -32,7 +32,9 @@ import {
     faMotorcycle,
     faSearch, 
     faEdit,
-    faBell
+    faBell,
+    faList,
+    faPlus
 } from '@fortawesome/free-solid-svg-icons';
 
 /* --- 2. Agregarlos a la librería --- */
@@ -41,7 +43,7 @@ library.add(
     faArrowRightFromBracket, faBoxOpen, faShoppingCart, 
     faCheck, faCashRegister, faClipboardList, faTimes, 
     faPrint,
-    faBasketShopping, faLocationDot, faRotate, faCheckCircle, faPhone, faMapMarkerAlt, faMoneyBillWave, faMotorcycle, faSearch, faEdit,faBell
+    faBasketShopping, faLocationDot, faRotate, faCheckCircle, faPhone, faMapMarkerAlt, faMoneyBillWave, faMotorcycle, faSearch, faEdit,faBell, faList, faPlus
 );
 
 import 'bootstrap/dist/css/bootstrap.min.css'; 

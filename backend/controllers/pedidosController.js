@@ -57,18 +57,20 @@ exports.crearPedido = async (req, res) => {
         }
 
         // 3. Insertar Pedido
-        // Preparamos variables finales para la query (Nivel 3 de seguridad: Variables explicitas)
-        const val_id_cliente = clienteFinalId || null; // Si es 0 o undefined, pasa a null
+        const val_id_cliente = clienteFinalId || null;
         const val_tipo_venta = tipo_venta || 'local';
         const val_total_neto = total_neto || 0;
         const val_costo_delivery = costo_delivery || 0;
         const val_total_final = total_final || 0;
         const val_metodo_pago = metodo_pago || 'efectivo';
         const val_id_vendedor = id_vendedor || 1;
+        
+        // NUEVO: Recibir referencia (puede ser el vuelto o el código de yape)
+        const val_referencia = req.body.referencia_pago || ''; 
 
         const [pedidoResult] = await connection.execute(
-            `INSERT INTO pedidos (fecha_hora, id_cliente, tipo_venta, total_neto, costo_delivery, total_final, metodo_pago, estado, id_vendedor) 
-             VALUES (NOW(), ?, ?, ?, ?, ?, ?, 'pendiente', ?)`,
+            `INSERT INTO pedidos (fecha_hora, id_cliente, tipo_venta, total_neto, costo_delivery, total_final, metodo_pago, referencia_pago, estado, id_vendedor) 
+             VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)`, // <--- Agregamos un ? más
             [
                 val_id_cliente, 
                 val_tipo_venta, 
@@ -76,6 +78,7 @@ exports.crearPedido = async (req, res) => {
                 val_costo_delivery, 
                 val_total_final, 
                 val_metodo_pago, 
+                val_referencia, // <--- Enviamos la referencia
                 val_id_vendedor
             ]
         );
@@ -155,5 +158,23 @@ exports.actualizarEstado = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error al actualizar estado' });
+    }
+};
+
+// Obtener ventas para reportes (SIN LÍMITE y solo pagadas)
+exports.reporteVentas = async (req, res) => {
+    try {
+        // Traemos todas las ventas finalizadas, ordenadas por fecha (más recientes primero)
+        const [ventas] = await pool.query(`
+            SELECT p.*, c.nombre as nombre_cliente 
+            FROM pedidos p 
+            LEFT JOIN clientes c ON p.id_cliente = c.id_cliente 
+            WHERE p.estado = 'entregado_pagado'
+            ORDER BY p.fecha_hora DESC
+        `);
+        res.json(ventas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error en reporte' });
     }
 };

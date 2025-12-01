@@ -138,15 +138,11 @@ const filtros = ref({
 // Cargar datos del Backend
 const cargarVentas = async () => {
     try {
-        // Reutilizamos el endpoint de pedidos. 
-        // En un sistema real grande, deberías tener un endpoint específico que reciba fechas (?from=X&to=Y)
-        // Pero para este nivel, filtrar en frontend funciona perfecto y rápido.
-        const res = await axios.get('http://localhost:3000/api/pedidos');
+        // CAMBIO: Usamos el endpoint específico '/reporte'
+        const res = await axios.get('http://localhost:3000/api/pedidos/reporte');
         
-        // Solo nos interesan los pedidos COMPLETADOS (entregado_pagado)
-        // OJO: Si quieres reportar todo lo vendido aunque no se haya entregado aun, quita el filtro de estado.
-        // Pero contablemente, solo lo pagado cuenta.
-        ventas.value = res.data.filter(p => p.estado === 'entregado_pagado');
+        // Ya no necesitamos filtrar por estado aquí porque el backend ya lo hace
+        ventas.value = res.data;
         
     } catch (e) { 
         console.error("Error cargando reportes:", e); 
