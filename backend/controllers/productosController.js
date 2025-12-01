@@ -64,7 +64,6 @@ exports.eliminarProducto = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Se recomienda el "Soft Delete" (desactivar) en lugar de eliminar permanentemente
         const [result] = await pool.execute(
             'UPDATE productos SET activo = FALSE WHERE id_producto = ?',
             [id]
@@ -81,7 +80,6 @@ exports.eliminarProducto = async (req, res) => {
     }
 };
 
-// Agregar esta función para obtener categorías únicas existentes
 exports.obtenerCategorias = async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT DISTINCT categoria FROM productos ORDER BY categoria');
@@ -90,12 +88,11 @@ exports.obtenerCategorias = async (req, res) => {
     } catch (e) { res.status(500).json({message: 'Error'}); }
 };
 
-// Modificar crearProducto para leer req.file
 exports.crearProducto = async (req, res) => {
     try {
         // Multer pone la info del archivo en req.file y los campos de texto en req.body
         const { nombre, descripcion, precio, categoria, stock } = req.body;
-        const imagen_path = req.file ? req.file.filename : 'default.jpg'; // Nombre generado
+        const imagen_path = req.file ? req.file.filename : 'default.jpg';
 
         const [result] = await pool.execute(
             'INSERT INTO productos (nombre, descripcion, precio, categoria, imagen_path, stock) VALUES (?, ?, ?, ?, ?, ?)',

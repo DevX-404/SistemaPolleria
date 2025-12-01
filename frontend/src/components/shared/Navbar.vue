@@ -18,13 +18,11 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Importa JS de Bootstrap para el dropdown
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; 
 
 onMounted(() => {
-  // Inicialización de dropdowns de Bootstrap si fuera necesario con componentes custom
 });
 </script>
 
 <style scoped>
-/* Styles handled in main.css for consistency */
 </style>

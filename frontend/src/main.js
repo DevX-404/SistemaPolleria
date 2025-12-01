@@ -1,5 +1,3 @@
-// frontend/src/main.js
-
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
@@ -18,11 +16,11 @@ import {
     faBoxOpen, 
     faShoppingCart, 
     faCheck,
-    faCashRegister,   // <--- NUEVO (Caja)
-    faClipboardList,   // <--- NUEVO (Lista Pedidos)
-    faTimes, // <--- AGREGAR
-    faPrint,  // <--- AGREGAR
-    faBasketShopping, // <--- AGREGAR SI FALTA
+    faCashRegister,   
+    faClipboardList,  
+    faTimes,
+    faPrint,  
+    faBasketShopping, 
     faLocationDot, 
     faRotate, 
     faCheckCircle,

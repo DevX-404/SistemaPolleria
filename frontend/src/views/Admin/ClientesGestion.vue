@@ -141,7 +141,7 @@ const clientesFiltrados = computed(() => {
 });
 
 const editarCliente = (cliente) => {
-    formCliente.value = { ...cliente }; // Clonar datos
+    formCliente.value = { ...cliente }; 
     mostrarModal.value = true;
 };
 
@@ -150,7 +150,7 @@ const guardarCambios = async () => {
         await axios.put(`http://localhost:3000/api/clientes/${formCliente.value.id_cliente}`, formCliente.value);
         alert('Cliente actualizado');
         mostrarModal.value = false;
-        cargarClientes(); // Recargar lista
+        cargarClientes(); 
     } catch (e) {
         alert('Error al actualizar');
     }

@@ -73,7 +73,6 @@
 </script>
 
 <style scoped>
-/* Estilo específico para el botón de salir rojo suave */
 .text-danger-custom {
     color: #ff6b6b !important;
     background-color: rgba(255, 107, 107, 0.1);

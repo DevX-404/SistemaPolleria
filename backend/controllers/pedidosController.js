@@ -32,7 +32,6 @@ exports.crearPedido = async (req, res) => {
 
         // 2. Lógica Delivery
         if (tipo_venta === 'delivery' && datos_cliente_delivery) {
-            // Aseguramos que NINGÚN campo sea undefined (Nivel 2 de seguridad)
             const nombre = datos_cliente_delivery.nombre || 'Cliente Sin Nombre';
             const telefono = datos_cliente_delivery.telefono || '';
             const direccion = datos_cliente_delivery.direccion || '';
@@ -65,12 +64,11 @@ exports.crearPedido = async (req, res) => {
         const val_metodo_pago = metodo_pago || 'efectivo';
         const val_id_vendedor = id_vendedor || 1;
         
-        // NUEVO: Recibir referencia (puede ser el vuelto o el código de yape)
         const val_referencia = req.body.referencia_pago || ''; 
 
         const [pedidoResult] = await connection.execute(
             `INSERT INTO pedidos (fecha_hora, id_cliente, tipo_venta, total_neto, costo_delivery, total_final, metodo_pago, referencia_pago, estado, id_vendedor) 
-             VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)`, // <--- Agregamos un ? más
+             VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)`, 
             [
                 val_id_cliente, 
                 val_tipo_venta, 
@@ -78,7 +76,7 @@ exports.crearPedido = async (req, res) => {
                 val_costo_delivery, 
                 val_total_final, 
                 val_metodo_pago, 
-                val_referencia, // <--- Enviamos la referencia
+                val_referencia,
                 val_id_vendedor
             ]
         );
@@ -107,18 +105,15 @@ exports.crearPedido = async (req, res) => {
         await connection.commit();
         console.log(`✅ Pedido #${idPedido} creado con éxito.`);
         
-        // CORRECCIÓN: Asegurar que la respuesta sea simple y directa
-        // A veces devolver JSONs complejos causa problemas si hay referencias circulares (no es el caso aquí, pero prevenimos)
         return res.status(201).json({ 
             message: 'Exito', 
             id_pedido: idPedido 
         });
 
     } catch (error) {
-        if (connection) await connection.rollback(); // Verificar connection existe
+        if (connection) await connection.rollback(); 
         console.error('❌ Error CRÍTICO en crearPedido:', error);
         
-        // Evitar enviar respuesta si ya se envió (headers sent)
         if (!res.headersSent) {
             return res.status(500).json({ message: error.message || 'Error interno' });
         }
@@ -127,7 +122,7 @@ exports.crearPedido = async (req, res) => {
     }
 };
 
-// LISTAR PEDIDOS (Con datos del cliente)
+// LISTAR PEDIDOS 
 exports.obtenerPedidos = async (req, res) => {
     try {
         const [pedidos] = await pool.query(`
@@ -146,11 +141,11 @@ exports.obtenerPedidos = async (req, res) => {
     }
 };
 
-// ACTUALIZAR ESTADO (Flujo de vida del pedido)
+// ACTUALIZAR ESTADO 
 exports.actualizarEstado = async (req, res) => {
     try {
         const { id } = req.params;
-        const { estado } = req.body; // Ej: 'en_camino', 'entregado'
+        const { estado } = req.body; 
         
         await pool.execute('UPDATE pedidos SET estado = ? WHERE id_pedido = ?', [estado, id]);
         
@@ -161,10 +156,9 @@ exports.actualizarEstado = async (req, res) => {
     }
 };
 
-// Obtener ventas para reportes (SIN LÍMITE y solo pagadas)
+// Obtener ventas para reportes
 exports.reporteVentas = async (req, res) => {
     try {
-        // Traemos todas las ventas finalizadas, ordenadas por fecha (más recientes primero)
         const [ventas] = await pool.query(`
             SELECT p.*, c.nombre as nombre_cliente 
             FROM pedidos p 

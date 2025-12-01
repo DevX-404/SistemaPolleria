@@ -1,6 +1,5 @@
 const { pool } = require('../config/db');
 
-// Obtener todos los clientes (con total de compras opcional)
 exports.obtenerClientes = async (req, res) => {
     try {
         const [rows] = await pool.query(`

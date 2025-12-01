@@ -8,11 +8,11 @@ const statsRoutes = require('./routes/statsRoutes');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Elige el puerto que prefieras
+const PORT = process.env.PORT || 3000; 
 
 // Middleware
-app.use(cors()); // Permite peticiones desde el frontend (Vite)
-app.use(express.json()); // Habilita el parsing de JSON en el body de las peticiones
+app.use(cors()); 
+app.use(express.json()); 
 
 // Rutas
 app.use('/api/productos', productosRoutes);

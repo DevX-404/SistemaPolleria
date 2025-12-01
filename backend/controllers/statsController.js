@@ -2,14 +2,14 @@ const { pool } = require('../config/db');
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        // 1. Ventas de Hoy (Suma total de pedidos entregados hoy)
+        // 1. Ventas de Hoy 
         const [ventasHoy] = await pool.query(`
             SELECT SUM(total_final) as total, COUNT(*) as cantidad 
             FROM pedidos 
             WHERE DATE(fecha_hora) = CURDATE() AND estado = 'entregado_pagado'
         `);
 
-        // 2. Pedidos Pendientes (Para alerta)
+        // 2. Pedidos Pendientes 
         const [pendientes] = await pool.query(`
             SELECT COUNT(*) as total FROM pedidos WHERE estado = 'pendiente'
         `);
